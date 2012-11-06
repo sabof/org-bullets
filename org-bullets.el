@@ -1,3 +1,4 @@
+(require 'cl)
 (defvar org-bullets-dots nil)
 (setq-default org-bullets-dots nil)
 (make-variable-buffer-local 'org-bullets-dots)
@@ -35,7 +36,6 @@
   (org-cycle))
 
 (defun* org-bullets-make-star (bullet-string)
-  ;; (return-from org-bullets-make-star)
   (let* ((map '(keymap
                 (mouse-1 . org-cycle)
                 (mouse-2 . (lambda (e)
@@ -97,20 +97,15 @@
   (setq org-bullets-has-changed nil))
 
 (defun* org-bullets-enable ()
-  ;; (return-from org-bullets-enable)
-  ;; (jit-lock-register 'org-bullets)
   (add-hook 'after-change-functions 'org-bullets-notify-change nil t)
-  ;; (add-hook 'after-change-functions 'org-bullets nil t)
   (add-hook 'post-command-hook 'org-bullets-post-command-hook nil t)
   (org-bullets)
   )
 
 (defun* org-bullets-disable ()
-  ;; (return-from org-bullets-enable)
   (jit-lock-unregister 'org-bullets)
   (remove-hook 'after-change-functions 'org-bullets-notify-change t)
   (remove-hook 'post-command-hook 'org-bullets-post-command-hook t)
-  ;; (remove-hook 'post-command-hook 'org-bullets t)
   (mapc 'delete-overlay org-bullets-dots)
   nil)
 
