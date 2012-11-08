@@ -35,7 +35,7 @@
     ;; "▸"
     )
   "This variable contains the list of bullets.
-It can contain any number of symbols, which will repeated.")
+It can contain any number of symbols, which will be repeated.")
 
 (defun org-bullets-match-length ()
   (- (match-end 0) (match-beginning 0)))
