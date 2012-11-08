@@ -1,10 +1,18 @@
+;;; org-bullets.el --- Show bullets in org-mode as UTF-8 characters
+
+;; The project is hosted at https://github.com/sabof/org-bullets
+;; The latest version, and all the relevant information can be found there.
+
 (require 'cl)
+
 (defvar org-bullets-dots nil)
 (setq-default org-bullets-dots nil)
 (make-variable-buffer-local 'org-bullets-dots)
+
 (defvar org-bullets-has-changed nil)
 (make-variable-buffer-local 'org-bullets-has-changed)
-;; A collection of unicode bullets
+
+;; A nice collection of unicode bullets:
 ;; http://nadeausoftware.com/articles/2007/11/latency_friendly_customized_bullets_using_unicode_characters
 (defvar org-bullets-bullet-list
   '(
@@ -25,17 +33,14 @@
     ;; "•"
     ;; "★"
     ;; "▸"
-    ))
+    )
+  "This variable contains the list of bullets.
+It can contain any number of symbols, which will repeated.")
 
-(defun match-length ()
+(defun org-bullets-match-length ()
   (- (match-end 0) (match-beginning 0)))
 
-(defun org-bullets-cycle (event)
-  (interactive "E")
-  (mouse-set-point event)
-  (org-cycle))
-
-(defun* org-bullets-make-star (bullet-string)
+(defun* org-bullets-make-star (bullet-string counter)
   (let* ((map '(keymap
                 (mouse-1 . org-cycle)
                 (mouse-2 . (lambda (e)
@@ -48,7 +53,7 @@
                    (looking-at "\\*+")
                    (intern (concat "org-level-"
                                    (int-to-string
-                                    (1+ (mod (1- (match-length))
+                                    (1+ (mod (1- (org-bullets-match-length))
                                              8))))))))
          (overlay (make-overlay (point)
                                 (1+ (point)))))
@@ -71,14 +76,14 @@
       (org-bullets-clear)
       (goto-char (point-min))
       (while (re-search-forward "^\\*+" nil t)
-        (let* ((bullet-string (nth (mod (1- (match-length))
+        (let* ((bullet-string (nth (mod (1- (org-bullets-match-length))
                                         (list-length org-bullets-bullet-list))
                                    org-bullets-bullet-list)))
           (goto-char (match-beginning 0))
           (if (save-match-data (looking-at "^\\*+ "))
-              (let ((counter (1- (match-length))))
+              (let ((counter (1- (org-bullets-match-length))))
                 (while (looking-at "[* ]")
-                  (org-bullets-make-star bullet-string)
+                  (org-bullets-make-star bullet-string counter)
                   (forward-char)
                   (decf counter)))
               (goto-char (match-end 0)))
@@ -109,6 +114,8 @@
   (mapc 'delete-overlay org-bullets-dots)
   nil)
 
+;;; Interface
+
 (define-minor-mode org-bullets-mode
     "UTF8 Bullets for org-mode"
   nil nil nil
@@ -117,3 +124,5 @@
       (org-bullets-disable)))
 
 (provide 'org-bullets)
+
+;;; org-bullets.el ends here
