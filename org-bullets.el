@@ -1,23 +1,23 @@
 ;;; org-bullets.el --- Show bullets in org-mode as UTF-8 characters
 ;;; Version: 0.1
+;;; Author: sabof
 
 ;;; Commentary:
 
 ;; The project is hosted at https://github.com/sabof/org-bullets
 ;; The latest version, and all the relevant information can be found there.
 
+;;; Code:
+
 (require 'cl)
 
-(defvar org-bullets-dots nil)
-(setq-default org-bullets-dots nil)
-(make-variable-buffer-local 'org-bullets-dots)
-
-(defvar org-bullets-has-changed nil)
-(make-variable-buffer-local 'org-bullets-has-changed)
+(defgroup org-bullets nil
+  "Use different background for even and odd lines."
+  :group 'org-appearance)
 
 ;; A nice collection of unicode bullets:
 ;; http://nadeausoftware.com/articles/2007/11/latency_friendly_customized_bullets_using_unicode_characters
-(defvar org-bullets-bullet-list
+(defcustom org-bullets-bullet-list
   '(
     ;;; Large
     ;; ●
@@ -38,7 +38,17 @@
     ;; "▸"
     )
   "This variable contains the list of bullets.
-It can contain any number of symbols, which will be repeated.")
+It can contain any number of symbols, which will be repeated."
+  :group 'org-bullets
+  :type '(repeat (string)))
+
+
+(defvar org-bullet-overlays nil)
+(setq-default org-bullet-overlays nil)
+(make-variable-buffer-local 'org-bullet-overlays)
+
+(defvar org-bullets-has-changed nil)
+(make-variable-buffer-local 'org-bullets-has-changed)
 
 (defun org-bullets-match-length ()
   (- (match-end 0) (match-beginning 0)))
@@ -67,11 +77,11 @@ It can contain any number of symbols, which will be repeated.")
                                  'local-map map)
                      (propertize " "
                                  'local-map map)))
-    (push overlay org-bullets-dots)))
+    (push overlay org-bullet-overlays)))
 
 (defun org-bullets-clear ()
-  (mapc 'delete-overlay org-bullets-dots)
-  (setq org-bullets-dots nil))
+  (mapc 'delete-overlay org-bullet-overlays)
+  (setq org-bullet-overlays nil))
 
 (defun org-bullets (&rest ignore)
   (save-excursion
@@ -111,10 +121,9 @@ It can contain any number of symbols, which will be repeated.")
   )
 
 (defun* org-bullets-disable ()
-  (jit-lock-unregister 'org-bullets)
   (remove-hook 'after-change-functions 'org-bullets-notify-change t)
   (remove-hook 'post-command-hook 'org-bullets-post-command-hook t)
-  (mapc 'delete-overlay org-bullets-dots)
+  (mapc 'delete-overlay org-bullet-overlays)
   nil)
 
 ;;; Interface
