@@ -18,27 +18,17 @@
 ;; A nice collection of unicode bullets:
 ;; http://nadeausoftware.com/articles/2007/11/latency_friendly_customized_bullets_using_unicode_characters
 (defcustom org-bullets-bullet-list
-  '(
-    ;;; Large
-    ;; ●
+  '(;;; Large
     "◉"
-    ;; ♥
     "○"
     "✸"
-    ;; "◇"
     "✿"
-    ;; ✚ ✜ ☯ ◆ ♠ ♣ ♦ ☢ ❀
-    ;; "◆"
-    ;; ◖
-    ;; "▶"
+    ;; ♥ ● ◇ ✚ ✜ ☯ ◆ ♠ ♣ ♦ ☢ ❀ ◆ ◖ ▶
     ;;; Small
-    ;; ►
-    ;; "•"
-    ;; "★"
-    ;; "▸"
+    ;; ► • ★ ▸
     )
   "This variable contains the list of bullets.
-It can contain any number of symbols, which will be repeated."
+    It can contain any number of symbols, which will be repeated."
   :group 'org-bullets
   :type '(repeat (string)))
 
@@ -76,18 +66,24 @@ It can contain any number of symbols, which will be repeated."
                                  'local-map map)
                      (propertize " "
                                  'local-map map)))
+    (overlay-put overlay 'is-bullet t)
     (push overlay org-bullet-overlays)))
 
 (defun org-bullets-clear ()
   (mapc 'delete-overlay org-bullet-overlays)
   (setq org-bullet-overlays nil))
 
-(defun org-bullets-redraw (&rest ignore)
+(defun* org-bullets-redraw (&optional (beginning (point-min)) (end (point-max)))
   (save-excursion
     (save-match-data
-      (org-bullets-clear)
-      (goto-char (point-min))
-      (while (re-search-forward "^\\*+" nil t)
+      ;; (org-bullets-clear)
+      (mapc 'delete-overlay
+            (remove-if-not
+             (lambda (overlay) (overlay-get overlay 'is-bullet))
+             (overlays-in beginning end)))
+      (goto-char beginning)
+      (while (and (re-search-forward "^\\*+" nil t)
+                  (<= (point) end))
         (let* ((bullet-string (nth (mod (1- (org-bullets-match-length))
                                         (list-length org-bullets-bullet-list))
                                    org-bullets-bullet-list)))
@@ -101,16 +97,19 @@ It can contain any number of symbols, which will be repeated."
               (goto-char (match-end 0)))
           )))))
 
-(defun org-bullets-notify-change (&rest ignore)
-  (setq org-bullets-has-changed t))
+(defun org-bullets-notify-change (&rest args)
+  (setq org-bullets-has-changed args))
 
 (defun* org-bullets-post-command-hook (&rest ignore)
   (unless org-bullets-has-changed
     (return-from org-bullets-post-command-hook))
-  (when (and (eq last-command 'self-insert-command)
-             (not (equal last-input-event ?\* )))
-    (return-from org-bullets-post-command-hook))
-  (org-bullets-redraw)
+  (org-bullets-redraw
+   (save-excursion
+     (goto-char (first org-bullets-has-changed))
+     (line-beginning-position))
+   (save-excursion
+     (goto-char (second org-bullets-has-changed))
+     (line-end-position)))
   (setq org-bullets-has-changed nil))
 
 (defun* org-bullets-enable ()
