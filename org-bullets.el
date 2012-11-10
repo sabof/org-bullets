@@ -76,7 +76,6 @@
 (defun* org-bullets-redraw (&optional (beginning (point-min)) (end (point-max)))
   (save-excursion
     (save-match-data
-      ;; (org-bullets-clear)
       (mapc 'delete-overlay
             (remove-if-not
              (lambda (overlay) (overlay-get overlay 'is-bullet))
@@ -103,26 +102,13 @@
 (defun* org-bullets-post-command-hook (&rest ignore)
   (unless org-bullets-has-changed
     (return-from org-bullets-post-command-hook))
-  (org-bullets-redraw
-   (save-excursion
-     (goto-char (first org-bullets-has-changed))
-     (line-beginning-position))
-   (save-excursion
-     (goto-char (second org-bullets-has-changed))
-     (line-end-position)))
+  (org-bullets-redraw (save-excursion
+                        (goto-char (first org-bullets-has-changed))
+                        (line-beginning-position))
+                      (save-excursion
+                        (goto-char (second org-bullets-has-changed))
+                        (line-end-position)))
   (setq org-bullets-has-changed nil))
-
-(defun* org-bullets-enable ()
-  (add-hook 'after-change-functions 'org-bullets-notify-change nil t)
-  (add-hook 'post-command-hook 'org-bullets-post-command-hook nil t)
-  (org-bullets-redraw)
-  )
-
-(defun* org-bullets-disable ()
-  (remove-hook 'after-change-functions 'org-bullets-notify-change t)
-  (remove-hook 'post-command-hook 'org-bullets-post-command-hook t)
-  (mapc 'delete-overlay org-bullet-overlays)
-  nil)
 
 ;;; Interface
 
@@ -130,8 +116,15 @@
     "UTF8 Bullets for org-mode"
   nil nil nil
   (if org-bullets-mode
-      (org-bullets-enable)
-      (org-bullets-disable)))
+      (progn
+        (add-hook 'after-change-functions 'org-bullets-notify-change nil t)
+        (add-hook 'post-command-hook 'org-bullets-post-command-hook nil t)
+        (org-bullets-redraw))
+      (progn
+        (remove-hook 'after-change-functions 'org-bullets-notify-change t)
+        (remove-hook 'post-command-hook 'org-bullets-post-command-hook t)
+        (mapc 'delete-overlay org-bullet-overlays)
+        nil)))
 
 (provide 'org-bullets)
 
