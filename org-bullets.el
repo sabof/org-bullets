@@ -42,7 +42,6 @@ It can contain any number of symbols, which will be repeated."
   :group 'org-bullets
   :type '(repeat (string)))
 
-
 (defvar org-bullet-overlays nil)
 (setq-default org-bullet-overlays nil)
 (make-variable-buffer-local 'org-bullet-overlays)
@@ -83,7 +82,7 @@ It can contain any number of symbols, which will be repeated."
   (mapc 'delete-overlay org-bullet-overlays)
   (setq org-bullet-overlays nil))
 
-(defun org-bullets (&rest ignore)
+(defun org-bullets-redraw (&rest ignore)
   (save-excursion
     (save-match-data
       (org-bullets-clear)
@@ -111,13 +110,13 @@ It can contain any number of symbols, which will be repeated."
   (when (and (eq last-command 'self-insert-command)
              (not (equal last-input-event ?\* )))
     (return-from org-bullets-post-command-hook))
-  (org-bullets)
+  (org-bullets-redraw)
   (setq org-bullets-has-changed nil))
 
 (defun* org-bullets-enable ()
   (add-hook 'after-change-functions 'org-bullets-notify-change nil t)
   (add-hook 'post-command-hook 'org-bullets-post-command-hook nil t)
-  (org-bullets)
+  (org-bullets-redraw)
   )
 
 (defun* org-bullets-disable ()
