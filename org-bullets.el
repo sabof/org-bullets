@@ -105,9 +105,10 @@
     (return-from org-bullets-post-command-hook))
   (org-bullets-redraw (save-excursion
                         (goto-char (first org-bullets-has-changed))
-                        (line-beginning-position))
+                        (forward-line -1))
                       (save-excursion
                         (goto-char (second org-bullets-has-changed))
+                        (forward-line)
                         (line-end-position)))
   (setq org-bullets-has-changed nil))
 
