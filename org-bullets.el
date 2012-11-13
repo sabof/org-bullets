@@ -98,16 +98,7 @@
           )))))
 
 (defun org-bullets-notify-change (&rest args)
-  ;; (setq org-bullets-changes args)
-  (push args org-bullets-changes)
-  ;; (org-bullets-redraw (save-excursion
-  ;;                       (goto-char (first args))
-  ;;                       (forward-line -1))
-  ;;                     (save-excursion
-  ;;                       (goto-char (second args))
-  ;;                       (forward-line)
-  ;;                       (line-end-position)))
-  )
+  (push args org-bullets-changes))
 
 (defun* org-bullets-post-command-hook (&rest ignore)
   (unless org-bullets-changes
@@ -116,11 +107,9 @@
         (max (reduce 'max org-bullets-changes :key 'second)))
     (org-bullets-redraw (save-excursion
                           (goto-char min)
-                          ;; (forward-line -1)
                           (line-beginning-position))
                         (save-excursion
                           (goto-char max)
-                          ;; (forward-line)
                           (line-end-position))))
   (setq org-bullets-changes nil))
 
