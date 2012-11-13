@@ -37,8 +37,8 @@
 (setq-default org-bullet-overlays nil)
 (make-variable-buffer-local 'org-bullet-overlays)
 
-(defvar org-bullets-has-changed nil)
-(make-variable-buffer-local 'org-bullets-has-changed)
+(defvar org-bullets-changes nil)
+(make-variable-buffer-local 'org-bullets-changes)
 
 (defun org-bullets-match-length ()
   (- (match-end 0) (match-beginning 0)))
@@ -98,19 +98,31 @@
           )))))
 
 (defun org-bullets-notify-change (&rest args)
-  (setq org-bullets-has-changed args))
+  ;; (setq org-bullets-changes args)
+  (push args org-bullets-changes)
+  ;; (org-bullets-redraw (save-excursion
+  ;;                       (goto-char (first args))
+  ;;                       (forward-line -1))
+  ;;                     (save-excursion
+  ;;                       (goto-char (second args))
+  ;;                       (forward-line)
+  ;;                       (line-end-position)))
+  )
 
 (defun* org-bullets-post-command-hook (&rest ignore)
-  (unless org-bullets-has-changed
+  (unless org-bullets-changes
     (return-from org-bullets-post-command-hook))
-  (org-bullets-redraw (save-excursion
-                        (goto-char (first org-bullets-has-changed))
-                        (forward-line -1))
-                      (save-excursion
-                        (goto-char (second org-bullets-has-changed))
-                        (forward-line)
-                        (line-end-position)))
-  (setq org-bullets-has-changed nil))
+  (let ((min (reduce 'min org-bullets-changes :key 'first))
+        (max (reduce 'max org-bullets-changes :key 'second)))
+    (org-bullets-redraw (save-excursion
+                          (goto-char min)
+                          ;; (forward-line -1)
+                          (line-beginning-position))
+                        (save-excursion
+                          (goto-char max)
+                          ;; (forward-line)
+                          (line-end-position))))
+  (setq org-bullets-changes nil))
 
 ;;; Interface
 
