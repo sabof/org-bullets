@@ -110,6 +110,7 @@
                           (line-beginning-position))
                         (save-excursion
                           (goto-char max)
+                          (forward-line)
                           (line-end-position))))
   (setq org-bullets-changes nil))
 
