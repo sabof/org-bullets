@@ -29,12 +29,11 @@
     ;; ► • ★ ▸
     )
   "This variable contains the list of bullets.
-    It can contain any number of symbols, which will be repeated."
+It can contain any number of symbols, which will be repeated."
   :group 'org-bullets
-  :type '(repeat (string)))
+  :type '(repeat (string :tag "Bullet character")))
 
 (defvar org-bullet-overlays nil)
-(setq-default org-bullet-overlays nil)
 (make-variable-buffer-local 'org-bullet-overlays)
 
 (defvar org-bullets-changes nil)
@@ -114,8 +113,12 @@
                           (line-end-position))))
   (setq org-bullets-changes nil))
 
+;;;###autoload
+(custom-add-frequent-value 'org-mode-hook 'org-bullets-mode)
+
 ;;; Interface
 
+;;;###autoload
 (define-minor-mode org-bullets-mode
     "UTF8 Bullets for org-mode"
   nil nil nil
@@ -124,11 +127,9 @@
         (add-hook 'after-change-functions 'org-bullets-notify-change nil t)
         (add-hook 'post-command-hook 'org-bullets-post-command-hook nil t)
         (org-bullets-redraw))
-      (progn
-        (remove-hook 'after-change-functions 'org-bullets-notify-change t)
-        (remove-hook 'post-command-hook 'org-bullets-post-command-hook t)
-        (mapc 'delete-overlay org-bullet-overlays)
-        nil)))
+    (remove-hook 'after-change-functions 'org-bullets-notify-change t)
+    (remove-hook 'post-command-hook 'org-bullets-post-command-hook t)
+    (mapc 'delete-overlay org-bullet-overlays)))
 
 (provide 'org-bullets)
 
