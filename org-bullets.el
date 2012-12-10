@@ -128,11 +128,9 @@
         (add-hook 'after-change-functions 'org-bullets-notify-change nil t)
         (add-hook 'post-command-hook 'org-bullets-post-command-hook nil t)
         (org-bullets-redraw))
-      (progn
-        (remove-hook 'after-change-functions 'org-bullets-notify-change t)
-        (remove-hook 'post-command-hook 'org-bullets-post-command-hook t)
-        (mapc 'delete-overlay org-bullet-overlays)
-        nil)))
+    (remove-hook 'after-change-functions 'org-bullets-notify-change t)
+    (remove-hook 'post-command-hook 'org-bullets-post-command-hook t)
+    (mapc 'delete-overlay org-bullet-overlays)))
 
 (provide 'org-bullets)
 
