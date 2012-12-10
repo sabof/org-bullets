@@ -29,12 +29,11 @@
     ;; ► • ★ ▸
     )
   "This variable contains the list of bullets.
-    It can contain any number of symbols, which will be repeated."
+It can contain any number of symbols, which will be repeated."
   :group 'org-bullets
-  :type '(repeat (string)))
+  :type '(repeat (string :tag "Bullet character")))
 
 (defvar org-bullet-overlays nil)
-(setq-default org-bullet-overlays nil)
 (make-variable-buffer-local 'org-bullet-overlays)
 
 (defvar org-bullets-changes nil)
