@@ -114,8 +114,12 @@
                           (line-end-position))))
   (setq org-bullets-changes nil))
 
+;;;###autoload
+(custom-add-frequent-value 'org-mode-hook 'org-bullets-mode)
+
 ;;; Interface
 
+;;;###autoload
 (define-minor-mode org-bullets-mode
     "UTF8 Bullets for org-mode"
   nil nil nil
