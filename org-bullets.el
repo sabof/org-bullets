@@ -8,6 +8,11 @@
 ;; The project is hosted at https://github.com/sabof/org-bullets
 ;; The latest version, and all the relevant information can be found there.
 
+;; INSTALLATION FOR PACKAGE.EL DOWNLOADS:
+
+;; After downloading the package, do [M-x customize-variable RET org-mode-hook],
+;; check the org-bullets-mode checkbox. [C-x C-s]. That's it.
+
 ;;; Code:
 
 (require 'cl)
