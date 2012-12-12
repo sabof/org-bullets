@@ -13,4 +13,5 @@ Copy the file somewhere in your load-path, then add to your .emacs:
 select, do [M-x eval-region]. The *s will be replaced with utf-8 bullets next time you open an org file
 <h5>Through MELPA and package.el</h5>
 After downloading the package, do [M-x customize-variable RET org-mode-hook],
-check the org-bullets-mode checkbox. [C-x C-s]. That's it.
+and check the org-bullets-mode checkbox.<br />
+Press [C-x C-s]. That's it.
