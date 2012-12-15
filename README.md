@@ -4,7 +4,6 @@ Show org-mode bullets as UTF-8 characters.
 ![screenshot](https://github.com/sabof/org-bullets/raw/master/screenshot.png)
 
 <h4>Installation</h4>
-<h5>Manual</h5>
 Copy the file somewhere in your load-path, then add to your .emacs:
 
     (require 'org-bullets)
