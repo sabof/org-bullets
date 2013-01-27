@@ -59,6 +59,19 @@ It can contain any number of symbols, which will be repeated."
 (defun org-bullets-match-length ()
   (- (match-end 0) (match-beginning 0)))
 
+(defcustom org-bullets-face-name
+  nil
+  "This variable allows the face to be used for Org-mode bullets
+to be overridden. If nil then the standard Org-mode face for the
+current heading's level will be used; set this to a string to
+override this face."
+  :group 'org-bullets
+  :type 'string)
+
+(defun org-bullets-make-face-name ()
+  (or (get-char-property (point) 'read-face-name)
+      (get-char-property (point) 'face)))
+
 (defun org-bullets-make-star (bullet-string counter)
   (let* ((map '(keymap
                 (mouse-1 . org-cycle)
@@ -66,14 +79,8 @@ It can contain any number of symbols, which will be repeated."
                              (interactive "e")
                              (mouse-set-point e)
                              (org-cycle)))))
-         (face (save-excursion
-                 (save-match-data
-                   (beginning-of-line)
-                   (looking-at "\\*+")
-                   (intern (concat "org-level-"
-                                   (int-to-string
-                                    (1+ (mod (1- (org-bullets-match-length))
-                                             8))))))))
+         (face (or org-bullets-face-name
+		   (org-bullets-make-face-name)))
          (overlay (make-overlay (point)
                                 (1+ (point)))))
     (overlay-put overlay 'display
