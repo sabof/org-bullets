@@ -76,8 +76,8 @@ It can contain any number of symbols, which will be repeated."
                   (mouse-set-point e)
                   (org-cycle)))))
          ( face
-           (or (and org-bullets-face-name
-                    (facep org-bullets-face-name))
+           (or (and (facep org-bullets-face-name)
+                    org-bullets-face-name)
                (save-excursion
                  (beginning-of-line)
                  (looking-at "\\*+")
