@@ -59,30 +59,34 @@ It can contain any number of symbols, which will be repeated."
 (defun org-bullets-match-length ()
   (- (match-end 0) (match-beginning 0)))
 
-(defcustom org-bullets-face-name
-  nil
-  "This variable allows the face to be used for Org-mode bullets
-to be overridden. If nil then the standard Org-mode face for the
-current heading's level will be used; set this to a string to
-override this face."
+(defcustom org-bullets-face-name nil
+  "This variable allows the org-mode bullets face to be
+ overridden. If set to a name of a face, that face will be
+ used. Otherwise the face of the heading level will be used."
   :group 'org-bullets
-  :type 'string)
-
-(defun org-bullets-make-face-name ()
-  (or (get-char-property (point) 'read-face-name)
-      (get-char-property (point) 'face)))
+  :type 'symbol)
 
 (defun org-bullets-make-star (bullet-string counter)
-  (let* ((map '(keymap
-                (mouse-1 . org-cycle)
-                (mouse-2 . (lambda (e)
-                             (interactive "e")
-                             (mouse-set-point e)
-                             (org-cycle)))))
-         (face (or org-bullets-face-name
-		   (org-bullets-make-face-name)))
-         (overlay (make-overlay (point)
-                                (1+ (point)))))
+  (let* (( map
+           '(keymap
+             (mouse-1 . org-cycle)
+             (mouse-2
+              . (lambda (e)
+                  (interactive "e")
+                  (mouse-set-point e)
+                  (org-cycle)))))
+         ( face
+           (or (and org-bullets-face-name
+                    (facep org-bullets-face-name))
+               (save-excursion
+                 (beginning-of-line)
+                 (looking-at "\\*+")
+                 (intern (concat "org-level-"
+                                 (int-to-string
+                                  (1+ (mod (1- (org-bullets-match-length))
+                                           8))))))))
+         ( overlay
+           (make-overlay (point) (1+ (point)))))
     (overlay-put overlay 'display
                  (if (zerop counter)
                      (propertize bullet-string
@@ -107,14 +111,16 @@ override this face."
       (goto-char beginning)
       (while (and (re-search-forward "^\\*+" nil t)
                   (<= (point) end))
-        (let* ((bullet-string (nth (mod (1- (org-bullets-match-length))
-                                        (list-length org-bullets-bullet-list))
-                                   org-bullets-bullet-list)))
+        (let* (( bullet-string
+                 (nth (mod (1- (org-bullets-match-length))
+                           (list-length org-bullets-bullet-list))
+                      org-bullets-bullet-list)))
           (goto-char (match-beginning 0))
           (if (save-match-data (looking-at "^\\*+ "))
               (let ((counter (1- (org-bullets-match-length))))
                 (while (looking-at "[* ]")
-                  (org-bullets-make-star bullet-string counter)
+                  (org-bullets-make-star
+                   bullet-string counter)
                   (forward-char)
                   (decf counter)))
               (goto-char (match-end 0)))
@@ -126,15 +132,16 @@ override this face."
 (defun* org-bullets-post-command-hook (&rest ignore)
   (unless org-bullets-changes
     (return-from org-bullets-post-command-hook))
-  (let ((min (reduce 'min org-bullets-changes :key 'first))
-        (max (reduce 'max org-bullets-changes :key 'second)))
-    (org-bullets-redraw (save-excursion
-                          (goto-char min)
-                          (line-beginning-position))
-                        (save-excursion
-                          (goto-char max)
-                          (forward-line)
-                          (line-end-position))))
+  (let (( min (reduce 'min org-bullets-changes :key 'first))
+        ( max (reduce 'max org-bullets-changes :key 'second)))
+    (org-bullets-redraw
+     (save-excursion
+       (goto-char min)
+       (line-beginning-position))
+     (save-excursion
+       (goto-char max)
+       (forward-line)
+       (line-end-position))))
   (setq org-bullets-changes nil))
 
 ;;; Interface
