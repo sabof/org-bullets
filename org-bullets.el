@@ -58,9 +58,10 @@ It can contain any number of symbols, which will be repeated."
   :type 'symbol)
 
 (defun org-bullets-level-char (level)
-  (nth (mod (1- level)
-            (length org-bullets-bullet-list))
-       org-bullets-bullet-list))
+  (string-to-char
+   (nth (mod (1- level)
+             (length org-bullets-bullet-list))
+        org-bullets-bullet-list)))
 
 (defun org-bullets-ptp (iter &rest args)
   (apply 'put-text-property
