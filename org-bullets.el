@@ -86,8 +86,8 @@ It can contain any number of symbols, which will be repeated."
                             (+ iter (match-beginning 0) 1)
                             (org-bullets-level-char level))
                            (if (facep org-bullets-face-name)
-                               (org-bullets-ptp 'face org-bullets-face-name)))
-                         (org-bullets-ptp 'face org-bullets-face-name)
+                               (org-bullets-ptp iter 'face org-bullets-face-name)))
+                         (org-bullets-ptp iter 'face org-bullets-face-name)
                          (put-text-property
                           (+ iter (match-beginning 0))
                           (+ iter (match-beginning 0) 1)
