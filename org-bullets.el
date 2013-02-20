@@ -85,15 +85,13 @@ It can contain any number of symbols, which will be repeated."
                             (+ iter (match-beginning 0))
                             (+ iter (match-beginning 0) 1)
                             (org-bullets-level-char level))
-                           (if (facep org-bullets-face-name)
-                               (org-bullets-ptp iter 'face org-bullets-face-name)))
-                         (org-bullets-ptp iter 'face org-bullets-face-name)
-                         (put-text-property
-                          (+ iter (match-beginning 0))
-                          (+ iter (match-beginning 0) 1)
-                          'face (list :foreground
-                                      (face-attribute 'default :background))
-                          ))
+                           (when (facep org-bullets-face-name)
+                             (org-bullets-ptp
+                              iter 'face org-bullets-face-name)))
+                         (org-bullets-ptp
+                          iter 'face (list :foreground
+                                           (face-attribute
+                                            'default :background))))
                      (put-text-property
                       (match-beginning 0)
                       (match-end 0)
