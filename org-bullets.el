@@ -113,7 +113,8 @@ It can contain any number of symbols, which will be repeated."
           (goto-char (point-min))
           (font-lock-remove-keywords nil keyword)
           (while (re-search-forward "^\\*+ " nil t)
-            (decompose-region (match-beginning 0) (match-end 0))))
+            (decompose-region (match-beginning 0) (match-end 0)))
+          (font-lock-fontify-buffer))
         )))
 
 (provide 'org-bullets)
