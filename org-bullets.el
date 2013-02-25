@@ -65,8 +65,10 @@ It can contain any number of symbols, which will be repeated."
          (interactive "e")
          (mouse-set-point e)
          (org-cycle))))
-  "Mouse events for bullets. Should this be undesirable, one can
- remove them with \(setcdr org-bullets-bullet-map nil\)")
+  "Mouse events for bullets.
+Should this be undesirable, one can remove them with
+
+\(setcdr org-bullets-bullet-map nil\)")
 
 (defun org-bullets-level-char (level)
   (string-to-char
