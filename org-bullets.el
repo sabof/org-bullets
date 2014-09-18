@@ -121,6 +121,10 @@ Should this be undesirable, one can remove them with
         (font-lock-fontify-buffer))
       )))
 
+(add-hook 'org-bullets-mode-hook
+          '(lambda ()
+             (font-lock-fontify-buffer)))
+
 (provide 'org-bullets)
 
 ;;; org-bullets.el ends here
