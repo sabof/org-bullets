@@ -110,7 +110,9 @@ Should this be undesirable, one can remove them with
                                       org-bullets-bullet-map)
                    nil))))))
     (if org-bullets-mode
-        (font-lock-add-keywords nil keyword)
+        (progn
+          (font-lock-add-keywords nil keyword)
+          (font-lock-fontify-buffer))
       (save-excursion
         (goto-char (point-min))
         (font-lock-remove-keywords nil keyword)
