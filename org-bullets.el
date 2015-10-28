@@ -57,6 +57,18 @@ It can contain any number of symbols, which will be repeated."
   :group 'org-bullets
   :type 'symbol)
 
+(defcustom org-bullets-invisible-leading-stars nil
+  "Invisible leading stars, instead of hidden via colour.
+
+Instead of making leading stars of headings have the same
+colour with background, make them disappear completely.  Useful
+if the theme used or the contents of `org-bullets-bullet-list'
+makes obvious the level of the heading.  Be aware that the
+distance of the bullets from the left edge of the window will be
+identical for all levels."
+  :group 'org-bullets
+  :type 'boolean)
+
 (defvar org-bullets-bullet-map
   '(keymap
     (mouse-1 . org-cycle)
@@ -99,11 +111,15 @@ Should this be undesirable, one can remove them with
                                         (- (match-end 0) 1)
                                         'face
                                         org-bullets-face-name))
-                   (put-text-property (match-beginning 0)
-                                      (- (match-end 0) 2)
-                                      'face (list :foreground
-                                                  (face-attribute
-                                                   'default :background)))
+                   (if org-bullets-invisible-leading-stars
+                      (put-text-property (match-beginning 0)
+                                         (- (match-end 0) 2)
+                                         'invisible t)
+                    (put-text-property (match-beginning 0)
+                                       (- (match-end 0) 2)
+                                       'face (list :foreground
+                                                   (face-attribute
+                                                    'default :background))))
                    (put-text-property (match-beginning 0)
                                       (match-end 0)
                                       'keymap
