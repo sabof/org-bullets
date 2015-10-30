@@ -114,7 +114,7 @@ Should this be undesirable, one can remove them with
                    (if org-bullets-invisible-leading-stars
                       (put-text-property (match-beginning 0)
                                          (- (match-end 0) 2)
-                                         'invisible t)
+                                         'display '(space . (:width 0)))
                     (put-text-property (match-beginning 0)
                                        (- (match-end 0) 2)
                                        'face (list :foreground
