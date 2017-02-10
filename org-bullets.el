@@ -78,7 +78,7 @@ Should this be undesirable, one can remove them with
 
 ;;;###autoload
 (define-minor-mode org-bullets-mode
-    "UTF8 Bullets for org-mode"
+  "UTF8 Bullets for org-mode"
   nil nil nil
   (let* (( keyword
            `(("^\\*+ "
@@ -99,11 +99,6 @@ Should this be undesirable, one can remove them with
                                         (- (match-end 0) 1)
                                         'face
                                         org-bullets-face-name))
-                   (put-text-property (match-beginning 0)
-                                      (- (match-end 0) 2)
-                                      'face (list :foreground
-                                                  (face-attribute
-                                                   'default :background)))
                    (put-text-property (match-beginning 0)
                                       (match-end 0)
                                       'keymap
