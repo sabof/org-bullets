@@ -102,10 +102,11 @@ the `org-bullets-bullet-list' lenght, the modulo is used."
                                        (- (match-end 0) 1)
                                        'face
                                        org-bullets-face-name))
-                  (put-text-property (match-beginning 0)
-                                     (match-end 0)
-                                     'keymap
-                                     org-bullets-bullet-map)
+                  (add-text-properties (match-beginning 0)
+                                       (match-end 0)
+                                       (list 'keymap org-bullets-bullet-map
+                                             'mouse-face 'highlight
+                                             'help-echo "mouse-2: visibility cycling for Org mode"))
                   nil))))))
     (if org-bullets-mode
         (progn
