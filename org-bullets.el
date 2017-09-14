@@ -62,11 +62,10 @@ not change the face used."
 (defvar org-bullets-bullet-map
   '(keymap
     (mouse-1 . org-cycle)
-    (mouse-2
-     . (lambda (e)
-         (interactive "e")
-         (mouse-set-point e)
-         (org-cycle))))
+    (mouse-2 . (lambda (e)
+                 (interactive "e")
+                 (mouse-set-point e)
+                 (org-cycle))))
   "Mouse events for bullets.
 Should this be undesirable, one can remove them with:
 
@@ -86,30 +85,30 @@ the `org-bullets-bullet-list' lenght, the modulo is used."
 (define-minor-mode org-bullets-mode
   "UTF8 Bullets for org-mode."
   nil nil nil
-  (let* (( keyword
-           `(("^\\*+ "
-              (0 (let* (( level (- (match-end 0) (match-beginning 0) 1))
-                        ( is-inline-task
-                          (and (boundp 'org-inlinetask-min-level)
-                               (>= level org-inlinetask-min-level))))
-                   (compose-region (- (match-end 0) 2)
-                                   (- (match-end 0) 1)
-                                   (org-bullets-level-char level))
-                   (when is-inline-task
-                     (compose-region (- (match-end 0) 3)
-                                     (- (match-end 0) 2)
-                                     (org-bullets-level-char level)))
-                   (when (facep org-bullets-face-name)
-                     (put-text-property (- (match-end 0)
-                                           (if is-inline-task 3 2))
-                                        (- (match-end 0) 1)
-                                        'face
-                                        org-bullets-face-name))
-                   (put-text-property (match-beginning 0)
-                                      (match-end 0)
-                                      'keymap
-                                      org-bullets-bullet-map)
-                   nil))))))
+  (let* ((keyword
+          `(("^\\*+ "
+             (0 (let* ((level (- (match-end 0) (match-beginning 0) 1))
+                       (is-inline-task
+                        (and (boundp 'org-inlinetask-min-level)
+                             (>= level org-inlinetask-min-level))))
+                  (compose-region (- (match-end 0) 2)
+                                  (- (match-end 0) 1)
+                                  (org-bullets-level-char level))
+                  (when is-inline-task
+                    (compose-region (- (match-end 0) 3)
+                                    (- (match-end 0) 2)
+                                    (org-bullets-level-char level)))
+                  (when (facep org-bullets-face-name)
+                    (put-text-property (- (match-end 0)
+                                          (if is-inline-task 3 2))
+                                       (- (match-end 0) 1)
+                                       'face
+                                       org-bullets-face-name))
+                  (put-text-property (match-beginning 0)
+                                     (match-end 0)
+                                     'keymap
+                                     org-bullets-bullet-map)
+                  nil))))))
     (if org-bullets-mode
         (progn
           (font-lock-add-keywords nil keyword)
