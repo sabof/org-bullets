@@ -1,7 +1,9 @@
-;;; org-bullets.el --- Show bullets in org-mode as UTF-8 characters
-;;; Version: 0.2.4
-;;; Author: sabof
-;;; URL: https://github.com/sabof/org-bullets
+;;; org-bullets.el --- Show bullets in org-mode as UTF-8 characters -*- lexical-binding: t -*-
+;; Version: 0.3.0
+;; Package-Requires: ((emacs "25.0"))
+;; Keywords: outlines, hypermedia, calendar, wp
+;; Author: sabof
+;; URL: https://github.com/sabof/org-bullets
 
 ;; This file is NOT part of GNU Emacs.
 ;;
@@ -27,11 +29,13 @@
 
 ;;; Code:
 
-(eval-when-compile (require 'cl))
+(require 'org)
+
 
 (defgroup org-bullets nil
   "Display bullets as UTF-8 characters"
-  :group 'org-appearance)
+  :group 'org-appearance
+  :link '(url-link "https://github.com/sabof/org-bullets"))
 
 ;; A nice collection of unicode bullets:
 ;; http://nadeausoftware.com/articles/2007/11/latency_friendly_customized_bullets_using_unicode_characters
@@ -46,80 +50,123 @@
     ;; ► • ★ ▸
     )
   "This variable contains the list of bullets.
+
 It can contain any number of symbols, which will be repeated."
   :group 'org-bullets
   :type '(repeat (string :tag "Bullet character")))
 
 (defcustom org-bullets-face-name nil
-  "This variable allows the org-mode bullets face to be
- overridden. If set to a name of a face, that face will be
- used. Otherwise the face of the heading level will be used."
+  "Face to override `org-mode' bullets face.
+
+If set to a name of a face, that face will be used.  When nil, do
+not change the face used."
   :group 'org-bullets
-  :type 'symbol)
+  :type '(choice (const :tag "Off" nil)
+                 (face :tag "Face")))
 
-(defvar org-bullets-bullet-map
+(defcustom org-bullets-compose-leading-stars
+  (and org-hide-leading-stars 'hide)
+  "Replace leading stars with the bullet character.
+
+This is different from `org-hide-leading-stars' in that it
+replace the printed character instead of changing the face.
+
+When `org-hide-leading-stars' is non nil, set use the hide
+option."
+  :group 'org-bullets
+  :type '(choice (const :tag "Keep leading stars" nil)
+                 (const :tag "Hide leading stars" hide)
+                 (const :tag "Use current level character" level)
+                 (string :tag "Use custom character(s)"))
+  :package-version '(org-bullets . "0.3.0"))
+
+(defcustom org-bullets-mouse-events t
+  "Attach mouse events to org bullets."
+  :group 'org-bullets
+  :type '(boolean :tag "Allow help-echo and click events" t)
+  :package-version '(org-bullets . "0.3.0"))
+
+(defconst org-bullets--bullet-events
   '(keymap
-    (mouse-1 . org-cycle)
-    (mouse-2
-     . (lambda (e)
-         (interactive "e")
-         (mouse-set-point e)
-         (org-cycle))))
-  "Mouse events for bullets.
-Should this be undesirable, one can remove them with
+    ((mouse-1 . org-cycle)
+     (mouse-2 . (lambda (e)
+                  (interactive "e")
+                  (mouse-set-point e)
+                  (org-cycle))))
+    mouse-face highlight
+    help-echo "mouse-2: visibility cycling for Org mode")
+  "Private.
 
-\(setcdr org-bullets-bullet-map nil\)")
+Mouse events to be attached to bullet text-properties.")
 
 (defun org-bullets-level-char (level)
+  "Return the bullet character for LEVEL.
+
+The bullet character is periodic in that if LEVEL is greater than
+the `org-bullets-bullet-list' lenght, the modulo is used."
   (string-to-char
    (nth (mod (1- level)
              (length org-bullets-bullet-list))
         org-bullets-bullet-list)))
 
+(defun org-bullets--char-series (string level)
+  "Private.
+
+Get the character in STRING at position LEVEL.
+
+If LEVEL is greater than the STRING series length, use the reminder."
+  (aref string (mod level (length string))))
+
 ;;;###autoload
 (define-minor-mode org-bullets-mode
-    "UTF8 Bullets for org-mode"
+  "Add UTF-8 Bullets for `org-mode'."
   nil nil nil
-  (let* (( keyword
-           `(("^\\*+ "
-              (0 (let* (( level (- (match-end 0) (match-beginning 0) 1))
-                        ( is-inline-task
-                          (and (boundp 'org-inlinetask-min-level)
-                               (>= level org-inlinetask-min-level))))
-                   (compose-region (- (match-end 0) 2)
-                                   (- (match-end 0) 1)
-                                   (org-bullets-level-char level))
-                   (when is-inline-task
-                     (compose-region (- (match-end 0) 3)
-                                     (- (match-end 0) 2)
-                                     (org-bullets-level-char level)))
-                   (when (facep org-bullets-face-name)
-                     (put-text-property (- (match-end 0)
-                                           (if is-inline-task 3 2))
-                                        (- (match-end 0) 1)
-                                        'face
-                                        org-bullets-face-name))
-                   (put-text-property (match-beginning 0)
-                                      (- (match-end 0) 2)
-                                      'face (list :foreground
-                                                  (face-attribute
-                                                   'default :background)))
-                   (put-text-property (match-beginning 0)
-                                      (match-end 0)
-                                      'keymap
-                                      org-bullets-bullet-map)
-                   nil))))))
+  (let* ((keyword
+          `(("^\\*+ "
+             (0 (let* ((level (- (match-end 0) (match-beginning 0) 1))
+                       (is-inline-task
+                        (and (boundp 'org-inlinetask-min-level)
+                             (>= level org-inlinetask-min-level)))
+                       (series))
+                  (compose-region (- (match-end 0) 2)
+                                  (- (match-end 0) 1)
+                                  (org-bullets-level-char level))
+                  (when is-inline-task
+                    (compose-region (- (match-end 0) 3)
+                                    (- (match-end 0) 2)
+                                    (org-bullets-level-char level)))
+                  (when (facep org-bullets-face-name)
+                    (put-text-property (- (match-end 0)
+                                          (if is-inline-task 3 2))
+                                       (- (match-end 0) 1)
+                                       'face
+                                       org-bullets-face-name))
+
+                  (pcase org-bullets-compose-leading-stars
+                    ((pred stringp) (setq series org-bullets-compose-leading-stars))
+                    ('hide (setq series " "))
+                    ('level (setq series (apply #'concat org-bullets-bullet-list))))
+
+                  (if series
+                      (dotimes (pos (1- level))
+                        (compose-region (+ (match-beginning 0) pos)
+                                        (+ (match-beginning 0) pos 1)
+                                        (org-bullets--char-series series pos))))
+                  (when org-bullets-mouse-events
+                    (add-text-properties (match-beginning 0)
+                                         (match-end 0)
+                                         org-bullets--bullet-events))
+                  nil))))))
     (if org-bullets-mode
         (progn
           (font-lock-add-keywords nil keyword)
-          (font-lock-fontify-buffer))
+          (font-lock-flush))
       (save-excursion
         (goto-char (point-min))
         (font-lock-remove-keywords nil keyword)
         (while (re-search-forward "^\\*+ " nil t)
           (decompose-region (match-beginning 0) (match-end 0)))
-        (font-lock-fontify-buffer))
-      )))
+        (font-lock-flush)))))
 
 (provide 'org-bullets)
 
