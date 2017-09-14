@@ -70,17 +70,18 @@ replace the printed character instead of changing the face."
                  (string :tag "Use custom character(s)")))
 
 
-(defvar org-bullets-bullet-map
+(defconst org-bullets--bullet-events
   '(keymap
-    (mouse-1 . org-cycle)
-    (mouse-2 . (lambda (e)
-                 (interactive "e")
-                 (mouse-set-point e)
-                 (org-cycle))))
-  "Mouse events for bullets.
-Should this be undesirable, one can remove them with:
+    ((mouse-1 . org-cycle)
+     (mouse-2 . (lambda (e)
+                  (interactive "e")
+                  (mouse-set-point e)
+                  (org-cycle))))
+    mouse-face highlight
+    help-echo "mouse-2: visibility cycling for Org mode")
+  "Private.
 
-\(setcdr org-bullets-bullet-map nil)")
+Mouse events for bullets.")
 
 (defun org-bullets-level-char (level)
   "Return the bullet character for LEVEL.
@@ -137,9 +138,7 @@ If LEVEL is greater than the STRING series length, use the reminder."
                                         (org-bullets--char-series series pos))))
                   (add-text-properties (match-beginning 0)
                                        (match-end 0)
-                                       (list 'keymap org-bullets-bullet-map
-                                             'mouse-face 'highlight
-                                             'help-echo "mouse-2: visibility cycling for Org mode"))
+                                       org-bullets--bullet-events)
                   nil))))))
     (if org-bullets-mode
         (progn
