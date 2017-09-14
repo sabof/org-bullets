@@ -66,11 +66,15 @@ It can contain any number of symbols, which will be repeated."
          (mouse-set-point e)
          (org-cycle))))
   "Mouse events for bullets.
-Should this be undesirable, one can remove them with
+Should this be undesirable, one can remove them with:
 
-\(setcdr org-bullets-bullet-map nil\)")
+\(setcdr org-bullets-bullet-map nil)")
 
 (defun org-bullets-level-char (level)
+  "Return the bullet character for LEVEL.
+
+The bullet character is periodic in that if LEVEL is greater than
+the `org-bullets-bullet-list' lenght, the modulo is used."
   (string-to-char
    (nth (mod (1- level)
              (length org-bullets-bullet-list))
@@ -78,7 +82,7 @@ Should this be undesirable, one can remove them with
 
 ;;;###autoload
 (define-minor-mode org-bullets-mode
-  "UTF8 Bullets for org-mode"
+  "UTF8 Bullets for org-mode."
   nil nil nil
   (let* (( keyword
            `(("^\\*+ "
