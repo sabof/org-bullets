@@ -32,7 +32,8 @@
 
 (defgroup org-bullets nil
   "Display bullets as UTF-8 characters"
-  :group 'org-appearance)
+  :group 'org-appearance
+  :link '(url-link "https://github.com/sabof/org-bullets"))
 
 ;; A nice collection of unicode bullets:
 ;; http://nadeausoftware.com/articles/2007/11/latency_friendly_customized_bullets_using_unicode_characters
@@ -47,6 +48,7 @@
     ;; ► • ★ ▸
     )
   "This variable contains the list of bullets.
+
 It can contain any number of symbols, which will be repeated."
   :group 'org-bullets
   :type '(repeat (string :tag "Bullet character")))
@@ -65,7 +67,10 @@ not change the face used."
   "Replace leading stars with the bullet character.
 
 This is different from `org-hide-leading-stars' in that it
-replace the printed character instead of changing the face."
+replace the printed character instead of changing the face.
+
+When `org-hide-leading-stars' is non nil, set use the hide
+option."
   :group 'org-bullets
   :type '(choice (const :tag "Keep leading stars" nil)
                  (const :tag "Hide leading stars" hide)
@@ -73,7 +78,7 @@ replace the printed character instead of changing the face."
                  (string :tag "Use custom character(s)")))
 
 (defcustom org-bullets-mouse-events t
-  "Allow attaching mouse events to org bullets."
+  "Attach mouse events to org bullets."
   :group 'org-bullets
   :type '(boolean :tag "Allow help-echo and click events" t))
 
@@ -88,7 +93,7 @@ replace the printed character instead of changing the face."
     help-echo "mouse-2: visibility cycling for Org mode")
   "Private.
 
-Mouse events for bullets.")
+Mouse events to be attached to bullet text-properties.")
 
 (defun org-bullets-level-char (level)
   "Return the bullet character for LEVEL.
@@ -110,7 +115,7 @@ If LEVEL is greater than the STRING series length, use the reminder."
 
 ;;;###autoload
 (define-minor-mode org-bullets-mode
-  "UTF8 Bullets for org-mode."
+  "Add UTF-8 Bullets for `org-mode'."
   nil nil nil
   (let* ((keyword
           `(("^\\*+ "
