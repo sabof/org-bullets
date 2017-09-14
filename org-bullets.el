@@ -51,11 +51,13 @@ It can contain any number of symbols, which will be repeated."
   :type '(repeat (string :tag "Bullet character")))
 
 (defcustom org-bullets-face-name nil
-  "This variable allows the org-mode bullets face to be
- overridden. If set to a name of a face, that face will be
- used. Otherwise the face of the heading level will be used."
+  "Face to override `org-mode' bullets face.
+
+If set to a name of a face, that face will be used.  When nil, do
+not change the face used."
   :group 'org-bullets
-  :type 'symbol)
+  :type '(choice (const :tag "Off" nil)
+                 (face :tag "Face")))
 
 (defvar org-bullets-bullet-map
   '(keymap
