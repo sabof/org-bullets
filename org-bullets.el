@@ -58,7 +58,7 @@ not change the face used."
                  (face :tag "Face")))
 
 (defcustom org-bullets-compose-leading-stars
-  (and org-hide-leading-stars hide)
+  (and org-hide-leading-stars 'hide)
   "Replace leading stars with the bullet character.
 
 This is different from `org-hide-leading-stars' in that it
