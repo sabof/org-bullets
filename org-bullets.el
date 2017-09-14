@@ -57,6 +57,19 @@ not change the face used."
   :type '(choice (const :tag "Off" nil)
                  (face :tag "Face")))
 
+(defcustom org-bullets-compose-leading-stars
+  (and org-hide-leading-stars hide)
+  "Replace leading stars with the bullet character.
+
+This is different from `org-hide-leading-stars' in that it
+replace the printed character instead of changing the face."
+  :group 'org-bullets
+  :type '(choice (const :tag "Keep leading stars" nil)
+                 (const :tag "Hide leading stars" hide)
+                 (const :tag "Use current level character" level)
+                 (string :tag "Use custom character(s)")))
+
+
 (defvar org-bullets-bullet-map
   '(keymap
     (mouse-1 . org-cycle)
@@ -79,6 +92,14 @@ the `org-bullets-bullet-list' lenght, the modulo is used."
              (length org-bullets-bullet-list))
         org-bullets-bullet-list)))
 
+(defun org-bullets--char-series (string level)
+  "Private.
+
+Get the character in STRING at position LEVEL.
+
+If LEVEL is greater than the STRING series length, use the reminder."
+  (aref string (mod level (length string))))
+
 ;;;###autoload
 (define-minor-mode org-bullets-mode
   "UTF8 Bullets for org-mode."
@@ -88,7 +109,8 @@ the `org-bullets-bullet-list' lenght, the modulo is used."
              (0 (let* ((level (- (match-end 0) (match-beginning 0) 1))
                        (is-inline-task
                         (and (boundp 'org-inlinetask-min-level)
-                             (>= level org-inlinetask-min-level))))
+                             (>= level org-inlinetask-min-level)))
+                       (series))
                   (compose-region (- (match-end 0) 2)
                                   (- (match-end 0) 1)
                                   (org-bullets-level-char level))
@@ -102,6 +124,17 @@ the `org-bullets-bullet-list' lenght, the modulo is used."
                                        (- (match-end 0) 1)
                                        'face
                                        org-bullets-face-name))
+
+                  (pcase org-bullets-compose-leading-stars
+                    ((pred stringp) (setq series org-bullets-compose-leading-stars))
+                    ('hide (setq series " "))
+                    ('level (setq series (apply #'concat org-bullets-bullet-list))))
+
+                  (if series
+                      (dotimes (pos (1- level))
+                        (compose-region (+ (match-beginning 0) pos)
+                                        (+ (match-beginning 0) pos 1)
+                                        (org-bullets--char-series series pos))))
                   (add-text-properties (match-beginning 0)
                                        (match-end 0)
                                        (list 'keymap org-bullets-bullet-map
