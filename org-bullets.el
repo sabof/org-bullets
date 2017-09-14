@@ -69,6 +69,10 @@ replace the printed character instead of changing the face."
                  (const :tag "Use current level character" level)
                  (string :tag "Use custom character(s)")))
 
+(defcustom org-bullets-mouse-events t
+  "Allow attaching mouse events to org bullets."
+  :group 'org-bullets
+  :type '(boolean :tag "Allow help-echo and click events" t))
 
 (defconst org-bullets--bullet-events
   '(keymap
@@ -136,9 +140,10 @@ If LEVEL is greater than the STRING series length, use the reminder."
                         (compose-region (+ (match-beginning 0) pos)
                                         (+ (match-beginning 0) pos 1)
                                         (org-bullets--char-series series pos))))
-                  (add-text-properties (match-beginning 0)
-                                       (match-end 0)
-                                       org-bullets--bullet-events)
+                  (when org-bullets-mouse-events
+                    (add-text-properties (match-beginning 0)
+                                         (match-end 0)
+                                         org-bullets--bullet-events))
                   nil))))))
     (if org-bullets-mode
         (progn
