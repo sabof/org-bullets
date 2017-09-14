@@ -1,7 +1,9 @@
 ;;; org-bullets.el --- Show bullets in org-mode as UTF-8 characters -*- lexical-binding: t -*-
-;;; Version: 0.3.0
-;;; Author: sabof
-;;; URL: https://github.com/sabof/org-bullets
+;; Version: 0.3.0
+;; Package-Requires: ((emacs "25.0"))
+;; Keywords: outlines, hypermedia, calendar, wp
+;; Author: sabof
+;; URL: https://github.com/sabof/org-bullets
 
 ;; This file is NOT part of GNU Emacs.
 ;;
@@ -75,12 +77,14 @@ option."
   :type '(choice (const :tag "Keep leading stars" nil)
                  (const :tag "Hide leading stars" hide)
                  (const :tag "Use current level character" level)
-                 (string :tag "Use custom character(s)")))
+                 (string :tag "Use custom character(s)"))
+  :package-version '(org-bullets . "0.3.0"))
 
 (defcustom org-bullets-mouse-events t
   "Attach mouse events to org bullets."
   :group 'org-bullets
-  :type '(boolean :tag "Allow help-echo and click events" t))
+  :type '(boolean :tag "Allow help-echo and click events" t)
+  :package-version '(org-bullets . "0.3.0"))
 
 (defconst org-bullets--bullet-events
   '(keymap
